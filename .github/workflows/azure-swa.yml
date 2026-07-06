@@ -1,0 +1,45 @@
+name: Déploiement Azure Static Web Apps
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - main
+
+jobs:
+  build_and_deploy:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    runs-on: ubuntu-latest
+    name: Build et déploiement
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Déploiement vers Azure SWA
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          # Emplacement du site (racine du repo : le index.html est à la racine)
+          app_location: "/"
+          # Pas d'API back-end pour ce site vitrine
+          api_location: ""
+          # Site statique : aucune étape de build, on sert la racine telle quelle
+          output_location: ""
+
+  close_pull_request:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    name: Fermeture de l'environnement de préversion
+    steps:
+      - name: Fermeture
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          action: "close"

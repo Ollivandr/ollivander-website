@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ollivander | Des outils numériques bâtis pour la construction québécoise</title>
+  <meta name="description" content="Ollivander développe des applications sur mesure pour les PME de la construction québécoise. Expertise terrain, technologie Azure et intégration Microsoft 365." />
+  <meta name="author" content="Ollivander" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Ollivander | Outils numériques pour la construction québécoise" />
+  <meta property="og:description" content="Pas une solution générique. Une app construite pour votre réalité de chantier." />
+  <meta property="og:locale" content="fr_CA" />
+  <meta property="og:locale:alternate" content="en_CA" />
+  <meta property="og:url" content="https://ollivander.ca" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg:            #08080A;
+      --bg-2:          #0E0E12;
+      --bg-card:       #121218;
+      --border:        #22222C;
+      --text:          #F5F5F7;
+      --text-dim:      #9A9AA6;
+      --text-dimmer:   #6A6A76;
+      --accent:        #2E6BFF;
+      --accent-2:      #5B8CFF;
+      --accent-glow:   rgba(46, 107, 255, 0.35);
+      --maple:         #E8442B;
+      --radius:        16px;
+      --max:           1120px;
+      --ease:          cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, .brand { font-family: 'Space Grotesk', sans-serif; letter-spacing: -0.02em; }
+
+    a { color: inherit; text-decoration: none; }
+
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+
+    section { position: relative; }
+
+    /* ---------- Accent helpers ---------- */
+    .accent { color: var(--accent-2); }
+    .eyebrow {
+      display: inline-block;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent-2);
+      margin-bottom: 16px;
+    }
+    .section-title { font-size: clamp(1.8rem, 4vw, 2.75rem); font-weight: 700; line-height: 1.1; }
+    .section-lead { color: var(--text-dim); font-size: 1.08rem; max-width: 620px; margin-top: 16px; }
+
+    /* ---------- Buttons ---------- */
+    .btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1rem;
+      padding: 14px 26px; border-radius: 12px; cursor: pointer; border: none;
+      transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), background 0.25s var(--ease);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+      color: #fff; box-shadow: 0 8px 30px var(--accent-glow);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px var(--accent-glow); }
+    .btn-ghost {
+      background: rgba(255,255,255,0.04); color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { border-color: var(--accent); background: rgba(46,107,255,0.08); transform: translateY(-2px); }
+
+    /* ---------- Nav ---------- */
+    header.nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      transition: background 0.3s var(--ease), border-color 0.3s var(--ease), backdrop-filter 0.3s;
+      border-bottom: 1px solid transparent;
+    }
+    header.nav.scrolled {
+      background: rgba(8,8,10,0.72);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border-bottom-color: var(--border);
+    }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 68px; }
+    .brand { font-size: 1.35rem; font-weight: 700; display: flex; align-items: center; gap: 2px; }
+    .brand .dot {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .nav-right { display: flex; align-items: center; gap: 20px; }
+    .nav-links { display: flex; gap: 32px; align-items: center; }
+    .nav-links a { color: var(--text-dim); font-size: 0.95rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta { padding: 9px 18px; font-size: 0.9rem; }
+    .lang-toggle {
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--text-dim);
+      font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 0.85rem; letter-spacing: 0.04em;
+      padding: 8px 13px; border-radius: 9px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+    }
+    .lang-toggle:hover { color: var(--text); border-color: var(--accent); background: rgba(46,107,255,0.08); }
+    .nav-toggle { display: none; background: none; border: none; color: var(--text); cursor: pointer; }
+    @media (max-width: 820px) {
+      .nav-links { display: none; }
+      .nav-toggle { display: block; }
+    }
+
+    /* ---------- Hero ---------- */
+    .hero { min-height: 100vh; display: flex; align-items: center; padding: 120px 0 80px; overflow: hidden; }
+    .hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        radial-gradient(60% 50% at 70% 20%, rgba(46,107,255,0.16) 0%, transparent 60%),
+        radial-gradient(50% 40% at 15% 80%, rgba(91,140,255,0.10) 0%, transparent 55%);
+    }
+    .hero-grid {
+      position: absolute; inset: 0; z-index: 0; opacity: 0.5;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px);
+      background-size: 54px 54px;
+      -webkit-mask-image: radial-gradient(70% 60% at 50% 40%, #000 0%, transparent 90%);
+      mask-image: radial-gradient(70% 60% at 50% 40%, #000 0%, transparent 90%);
+    }
+    .hero-content { position: relative; z-index: 2; max-width: 820px; }
+    .hero .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(46,107,255,0.10); border: 1px solid rgba(46,107,255,0.28);
+      color: var(--accent-2); font-size: 0.85rem; font-weight: 500;
+      padding: 7px 15px; border-radius: 999px; margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-size: clamp(2.4rem, 6.2vw, 4.4rem); font-weight: 700; line-height: 1.04;
+    }
+    .hero h1 .grad {
+      background: linear-gradient(120deg, var(--accent-2) 0%, #A9C4FF 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .hero p.sub { font-size: clamp(1.05rem, 2vw, 1.25rem); color: var(--text-dim); max-width: 640px; margin-top: 26px; }
+    .hero-actions { display: flex; gap: 16px; margin-top: 40px; flex-wrap: wrap; }
+    .hero-trust { display: flex; gap: 28px; margin-top: 56px; flex-wrap: wrap; color: var(--text-dimmer); font-size: 0.9rem; }
+    .hero-trust span { display: flex; align-items: center; gap: 8px; }
+
+    /* ---------- Generic section spacing ---------- */
+    .band { padding: 110px 0; }
+    .band-alt { background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 50%, var(--bg) 100%); }
+
+    /* ---------- Problem cards ---------- */
+    .cards-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; margin-top: 52px; }
+    @media (max-width: 720px) { .cards-4 { grid-template-columns: 1fr; } }
+    .prob-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 30px; position: relative; overflow: hidden;
+      transition: transform 0.3s var(--ease), border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
+    }
+    .prob-card::before {
+      content: ""; position: absolute; inset: 0; opacity: 0;
+      background: radial-gradient(120% 100% at 0% 0%, rgba(46,107,255,0.10), transparent 55%);
+      transition: opacity 0.3s var(--ease);
+    }
+    .prob-card:hover { transform: translateY(-4px); border-color: rgba(46,107,255,0.5); box-shadow: 0 16px 44px rgba(0,0,0,0.4); }
+    .prob-card:hover::before { opacity: 1; }
+    .prob-icon {
+      width: 52px; height: 52px; border-radius: 13px; margin-bottom: 20px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(46,107,255,0.10); border: 1px solid rgba(46,107,255,0.22); color: var(--accent-2);
+    }
+    .prob-card h3 { font-size: 1.18rem; font-weight: 600; line-height: 1.35; position: relative; }
+
+    /* ---------- Approach steps ---------- */
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 56px; }
+    @media (max-width: 820px) { .steps { grid-template-columns: 1fr; } }
+    .step {
+      position: relative; padding: 32px 28px; border-radius: var(--radius);
+      background: var(--bg-card); border: 1px solid var(--border);
+    }
+    .step .num {
+      font-family: 'Space Grotesk', sans-serif; font-size: 2.6rem; font-weight: 700; line-height: 1;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent; opacity: 0.9;
+    }
+    .step h3 { font-size: 1.3rem; font-weight: 600; margin: 16px 0 10px; }
+    .step p { color: var(--text-dim); font-size: 0.98rem; }
+    .step .connector {
+      position: absolute; top: 52px; right: -24px; width: 24px; height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+    }
+    @media (max-width: 820px) { .step .connector { display: none; } }
+
+    /* ---------- Nexus ---------- */
+    .nexus-wrap { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 56px; align-items: center; }
+    @media (max-width: 900px) { .nexus-wrap { grid-template-columns: 1fr; gap: 40px; } }
+    .nexus-badge-ms {
+      display: inline-flex; align-items: center; gap: 10px; margin-top: 26px;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      padding: 10px 16px; border-radius: 10px; font-size: 0.92rem; color: var(--text-dim); font-weight: 500;
+    }
+    .ms-logo { width: 18px; height: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 2px; flex-shrink: 0; }
+    .ms-logo i { display: block; width: 100%; height: 100%; }
+    .ms-logo i:nth-child(1){ background:#F25022; } .ms-logo i:nth-child(2){ background:#7FBA00; }
+    .ms-logo i:nth-child(3){ background:#00A4EF; } .ms-logo i:nth-child(4){ background:#FFB900; }
+    .module-list { display: flex; flex-direction: column; gap: 14px; }
+    .module {
+      display: flex; align-items: center; gap: 16px; padding: 18px 20px;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 13px;
+      transition: transform 0.25s var(--ease), border-color 0.25s var(--ease);
+    }
+    .module:hover { transform: translateX(6px); border-color: rgba(46,107,255,0.45); }
+    .module .check {
+      flex-shrink: 0; width: 34px; height: 34px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, rgba(46,107,255,0.20), rgba(91,140,255,0.10));
+      border: 1px solid rgba(46,107,255,0.3); color: var(--accent-2);
+    }
+    .module .m-body strong { font-weight: 600; font-size: 1.02rem; display: block; }
+    .module .m-body span { color: var(--text-dimmer); font-size: 0.86rem; }
+
+    /* ---------- Why (feature grid) ---------- */
+    .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 52px; }
+    @media (max-width: 900px) { .why-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 600px) { .why-grid { grid-template-columns: 1fr; } }
+    .why-item { padding: 26px; border-radius: var(--radius); background: var(--bg-card); border: 1px solid var(--border); }
+    .why-item .why-icon {
+      width: 46px; height: 46px; border-radius: 12px; margin-bottom: 18px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(46,107,255,0.10); border: 1px solid rgba(46,107,255,0.2); color: var(--accent-2);
+    }
+    .why-item h3 { font-size: 1.08rem; font-weight: 600; margin-bottom: 8px; }
+    .why-item p { color: var(--text-dim); font-size: 0.94rem; }
+
+    /* ---------- About ---------- */
+    .about-wrap { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 56px; align-items: center; }
+    @media (max-width: 900px) { .about-wrap { grid-template-columns: 1fr; gap: 36px; } }
+    .about-visual {
+      aspect-ratio: 1; border-radius: 24px; position: relative; overflow: hidden;
+      background: linear-gradient(160deg, var(--bg-card), var(--bg-2));
+      border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+    }
+    .about-visual .big-num {
+      font-family: 'Space Grotesk', sans-serif; font-weight: 700; text-align: center; line-height: 0.95;
+    }
+    .about-visual .big-num em {
+      display: block; font-style: normal; font-size: clamp(4rem, 12vw, 7rem);
+      background: linear-gradient(135deg, var(--accent-2) 0%, #A9C4FF 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .about-visual .big-num span { color: var(--text-dim); font-size: 1rem; font-family: 'Inter'; font-weight: 500; letter-spacing: 0.04em; }
+    .about-visual .ring { position: absolute; inset: -40%; background: radial-gradient(circle, transparent 60%, rgba(46,107,255,0.08) 70%, transparent 72%); }
+    .about-text p { color: var(--text-dim); font-size: 1.05rem; margin-top: 18px; }
+    .about-text p strong { color: var(--text); font-weight: 600; }
+
+    /* ---------- Contact ---------- */
+    .contact-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; }
+    @media (max-width: 820px) { .contact-wrap { grid-template-columns: 1fr; gap: 36px; } }
+    .contact-info .info-line { display: flex; align-items: center; gap: 14px; margin-top: 22px; color: var(--text-dim); }
+    .contact-info .info-line .ic {
+      width: 42px; height: 42px; border-radius: 11px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(46,107,255,0.10); border: 1px solid rgba(46,107,255,0.2); color: var(--accent-2);
+    }
+    .contact-info .info-line a:hover { color: var(--accent-2); }
+    form { display: flex; flex-direction: column; gap: 16px; }
+    .field label { display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-dim); margin-bottom: 7px; }
+    .field input, .field textarea {
+      width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: 11px;
+      padding: 13px 15px; color: var(--text); font-family: inherit; font-size: 0.98rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .field input:focus, .field textarea:focus {
+      outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(46,107,255,0.15);
+    }
+    .field textarea { resize: vertical; min-height: 120px; }
+
+    /* ---------- Footer ---------- */
+    footer.site {
+      border-top: 1px solid var(--border); padding: 40px 0; margin-top: 40px;
+      color: var(--text-dimmer); font-size: 0.9rem;
+    }
+    .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+
+    /* ---------- Scroll reveal ---------- */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+    .reveal.in { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== NAV ===== -->
+  <header class="nav" id="nav">
+    <div class="wrap nav-inner">
+      <a href="#hero" class="brand">Olli<span class="dot">v</span>ander</a>
+      <div class="nav-right">
+        <nav class="nav-links">
+          <a href="#problemes" data-en="Problems">Problèmes</a>
+          <a href="#approche" data-en="Approach">Approche</a>
+          <a href="#nexus" data-en="Nexus">Nexus</a>
+          <a href="#pourquoi" data-en="Why us">Pourquoi</a>
+          <a href="#apropos" data-en="About">À propos</a>
+          <a href="#contact" class="btn btn-primary nav-cta" data-en="Get in touch">Nous joindre</a>
+        </nav>
+        <button class="lang-toggle" id="langToggle" type="button" aria-label="Switch to English">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+          <span id="langLabel">EN</span>
+        </button>
+        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-links').style.cssText='display:flex;position:absolute;top:68px;right:24px;flex-direction:column;background:var(--bg-2);border:1px solid var(--border);padding:16px;border-radius:12px;gap:14px;'">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero" id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="wrap hero-content">
+      <span class="badge">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+        <span data-en="Digital transformation &middot; Qu&eacute;bec construction">Transformation numérique · Construction québécoise</span>
+      </span>
+      <h1 data-en="Digital tools<br><span class='grad'>built for Qu&eacute;bec</span> construction">Des outils numériques<br /><span class="grad">bâtis pour la construction</span> québécoise</h1>
+      <p class="sub" data-en="Not a generic solution, but an app built for your reality on site. Made by someone who knows construction from the inside, on Azure and Microsoft 365 technology.">Pas une solution générique, mais une app construite pour votre réalité de chantier. Développée par quelqu'un qui connaît la construction de l'intérieur, sur la technologie Azure et Microsoft 365.</p>
+      <div class="hero-actions">
+        <a href="#contact" class="btn btn-primary">
+          <span data-en="Let's talk about your project">Discuter de votre projet</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a href="#nexus" class="btn btn-ghost" data-en="Discover Nexus">Découvrir Nexus</a>
+      </div>
+      <div class="hero-trust">
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> <span data-en="16 years on the ground">16 ans sur le terrain</span></span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> <span data-en="Microsoft 365 integration">Intégration Microsoft 365</span></span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> <span data-en="Data hosted in Canada">Données hébergées au Canada</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PROBLÈMES ===== -->
+  <section class="band" id="problemes">
+    <div class="wrap">
+      <div class="reveal">
+        <span class="eyebrow" data-en="Sound familiar?">Ça vous parle?</span>
+        <h2 class="section-title" data-en="The problems we solve">Les problèmes qu'on règle</h2>
+        <p class="section-lead" data-en="Every job site has its irritants that cost time and money. We know them, and we solve them with custom-built tools.">Chaque chantier a ses irritants qui coûtent du temps et de l'argent. On les connaît, et on les règle avec des outils faits sur mesure.</p>
+      </div>
+      <div class="cards-4">
+        <div class="prob-card reveal">
+          <div class="prob-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          </div>
+          <h3 data-en="Your crews handle on-site expenses with no system?">Vos employés gèrent des dépenses en chantier sans système?</h3>
+        </div>
+        <div class="prob-card reveal">
+          <div class="prob-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h6"/><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><line x1="12" y1="7" x2="12" y2="17"/></svg>
+          </div>
+          <h3 data-en="Wasting time comparing documents by hand?">Vous perdez du temps à comparer des documents manuellement?</h3>
+        </div>
+        <div class="prob-card reveal">
+          <div class="prob-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="6" y="2" width="12" height="20" rx="2"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
+          </div>
+          <h3 data-en="Supplier invoices coming in by text message?">Vos factures fournisseurs arrivent par texto?</h3>
+        </div>
+        <div class="prob-card reveal">
+          <div class="prob-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+          </div>
+          <h3 data-en="Your team still working in Excel?">Votre équipe travaille encore dans Excel?</h3>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== APPROCHE ===== -->
+  <section class="band band-alt" id="approche">
+    <div class="wrap">
+      <div class="reveal">
+        <span class="eyebrow" data-en="Our method">Notre méthode</span>
+        <h2 class="section-title" data-en="An approach grounded in reality">Une approche ancrée dans le réel</h2>
+        <p class="section-lead" data-en="We don't sell technology for its own sake. We start from your real gaps, on the ground.">On ne vend pas de la technologie pour la technologie. On part de vos vraies lacunes, sur le terrain.</p>
+      </div>
+      <div class="steps">
+        <div class="step reveal">
+          <span class="connector"></span>
+          <div class="num">01</div>
+          <h3 data-en="Understand">Comprendre</h3>
+          <p data-en="We analyze your real gaps by talking with the people who live the job site every day. No guessing.">On analyse vos lacunes réelles en discutant avec le monde qui vit le chantier tous les jours. Pas de suppositions.</p>
+        </div>
+        <div class="step reveal">
+          <span class="connector"></span>
+          <div class="num">02</div>
+          <h3 data-en="Build">Construire</h3>
+          <p data-en="We build the solution right inside your Microsoft ecosystem: Teams, Outlook, SharePoint. Your team keeps its habits.">On développe la solution directement dans votre écosystème Microsoft : Teams, Outlook, SharePoint. Vos employés ne changent pas leurs habitudes.</p>
+        </div>
+        <div class="step reveal">
+          <div class="num">03</div>
+          <h3 data-en="Support">Accompagner</h3>
+          <p data-en="We grow with you. Your needs change, the tool adapts. We stay available, not just at launch.">On évolue avec vous. Vos besoins changent, l'outil s'adapte. On reste disponible, pas juste au lancement.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== NEXUS ===== -->
+  <section class="band" id="nexus">
+    <div class="wrap nexus-wrap">
+      <div class="reveal">
+        <span class="eyebrow" data-en="Flagship product">Produit phare</span>
+        <h2 class="section-title">Ollivander <span class="accent">Nexus</span></h2>
+        <p class="section-lead" data-en="A modular SaaS platform for Qu&eacute;bec construction companies. You turn on only the modules you need, and you pay for those only.">Une plateforme SaaS modulaire pour les compagnies de construction québécoises. Vous activez seulement les modules dont vous avez besoin, et vous payez seulement pour ceux-là.</p>
+        <div class="nexus-badge-ms">
+          <span class="ms-logo"><i></i><i></i><i></i><i></i></span>
+          <span data-en="Sign in with your existing Microsoft account">Connexion avec votre compte Microsoft existant</span>
+        </div>
+        <div style="margin-top:32px;">
+          <a href="#contact" class="btn btn-primary">
+            <span data-en="Book a demo">Voir une démo</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 5v14l11-7z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="module-list reveal">
+        <div class="module">
+          <span class="check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg></span>
+          <div class="m-body"><strong data-en="Invoice management">Gestion de factures</strong><span data-en="Automatic scanning and processing, even by text">Scan et traitement automatique, même par texto</span></div>
+        </div>
+        <div class="module">
+          <span class="check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg></span>
+          <div class="m-body"><strong data-en="Document management (Addenda)">Gestion documentaire (Addenda)</strong><span data-en="Addenda, contracts and bids in one place">Addenda, contrats, soumissions centralisés</span></div>
+        </div>
+        <div class="module">
+          <span class="check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg></span>
+          <div class="m-body"><strong data-en="Project management">Gestion de projets</strong><span data-en="Schedules, milestones and site tracking">Échéanciers, jalons et suivi de chantier</span></div>
+        </div>
+        <div class="module">
+          <span class="check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg></span>
+          <div class="m-body"><strong data-en="KPI dashboard">Tableau de bord KPI</strong><span data-en="Your key metrics in real time">Vos indicateurs clés en temps réel</span></div>
+        </div>
+        <div class="module">
+          <span class="check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg></span>
+          <div class="m-body"><strong data-en="Custom modules">Modules sur mesure</strong><span data-en="We build what your reality is missing">On bâtit ce qui manque à votre réalité</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== POURQUOI ===== -->
+  <section class="band band-alt" id="pourquoi">
+    <div class="wrap">
+      <div class="reveal">
+        <span class="eyebrow" data-en="What sets us apart">Ce qui nous distingue</span>
+        <h2 class="section-title" data-en="Why Ollivander">Pourquoi Ollivander</h2>
+      </div>
+      <div class="why-grid">
+        <div class="why-item reveal">
+          <div class="why-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 20h20"/><path d="M4 20V8l8-5 8 5v12"/><path d="M9 20v-6h6v6"/></svg></div>
+          <h3 data-en="16 years in construction">16 ans dans la construction</h3>
+          <p data-en="We understand your site constraints because we've lived them, not just read them in a book.">On comprend vos contraintes de chantier parce qu'on les a vécues, pas juste lues dans un livre.</p>
+        </div>
+        <div class="why-item reveal">
+          <div class="why-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg></div>
+          <h3 data-en="Microsoft / Azure expertise">Expertise Microsoft / Azure</h3>
+          <p data-en="We build directly on Azure and Microsoft 365, the environment you already use.">On développe directement sur Azure et Microsoft 365, l'environnement que vous utilisez déjà.</p>
+        </div>
+        <div class="why-item reveal">
+          <div class="why-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--maple)" stroke-width="1.8"><path d="M12 2l1.5 4.5L18 5l-2 4 4 1.5-4 1.5 2 4-4.5-1.5L12 22l-1.5-4.5L6 19l2-4-4-1.5 4-1.5-2-4 4.5 1.5z"/></svg></div>
+          <h3 data-en="Data hosted in Canada">Données hébergées au Canada</h3>
+          <p data-en="Your data stays in the country, in Azure Canada data centres. Nothing leaves Canada.">Vos données restent au pays, dans les centres Azure Canada. Rien ne sort du Canada.</p>
+        </div>
+        <div class="why-item reveal">
+          <div class="why-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+          <h3 data-en="Existing Microsoft login">Login Microsoft existant</h3>
+          <p data-en="No new account to manage. Your employees sign in with what they already have.">Aucun nouveau compte à gérer. Vos employés se connectent avec ce qu'ils ont déjà.</p>
+        </div>
+        <div class="why-item reveal">
+          <div class="why-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+          <h3 data-en="Per-module pricing">Tarification par module</h3>
+          <p data-en="You pay for what you use. No bloated all-in-one package.">Vous payez pour ce que vous utilisez. Pas de forfait tout-inclus gonflé.</p>
+        </div>
+        <div class="why-item reveal">
+          <div class="why-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/></svg></div>
+          <h3 data-en="Fast delivery">Livraison rapide</h3>
+          <p data-en="Focused solutions that fix a real problem, not big projects that never ship.">Des solutions ciblées qui règlent un vrai problème, pas des gros projets qui n'aboutissent jamais.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== À PROPOS ===== -->
+  <section class="band" id="apropos">
+    <div class="wrap about-wrap">
+      <div class="about-visual reveal">
+        <div class="ring"></div>
+        <div class="big-num"><em>16</em><span data-en="YEARS ON THE GROUND">ANS SUR LE TERRAIN</span></div>
+      </div>
+      <div class="about-text reveal">
+        <span class="eyebrow" data-en="About">À propos</span>
+        <h2 class="section-title" data-en="The gap between the job site and tech? We close it.">Le fossé entre le chantier et la techno? On le comble.</h2>
+        <p data-en="Ollivander started from a simple observation: too many digital tools are designed far from the job site, by people who've never set foot on one.">Ollivander est né d'un constat simple : trop d'outils numériques sont pensés loin du chantier, par des gens qui n'y ont jamais mis les pieds.</p>
+        <p data-en="After <strong>16 years in construction in Qu&eacute;bec</strong>, the founder knows the real gaps on the ground, and turns them into concrete solutions.">Après <strong>16 ans dans la construction au Québec</strong>, le fondateur connaît les vraies lacunes du terrain, et il les transforme en solutions concrètes.</p>
+        <p data-en="The mission: <strong>close the gap between the reality of the job site and technology</strong>.">La mission : <strong>combler le fossé entre la réalité du chantier et la technologie</strong>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CONTACT ===== -->
+  <section class="band band-alt" id="contact">
+    <div class="wrap contact-wrap">
+      <div class="contact-info reveal">
+        <span class="eyebrow" data-en="Let's talk">Parlons-en</span>
+        <h2 class="section-title" data-en="Let's talk about your project">Discutons de votre projet</h2>
+        <p class="section-lead" data-en="An idea, a job-site irritant, a question? Write to us. We answer fast, and we speak your language.">Une idée, un irritant de chantier, une question? Écrivez-nous. On répond vite, et on parle votre langage.</p>
+        <div class="info-line">
+          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></span>
+          <a href="mailto:olivier@ollivander.ca">olivier@ollivander.ca</a>
+        </div>
+        <div class="info-line">
+          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+          <span data-en="Based in Qu&eacute;bec. Available everywhere.">Basé au Québec. Disponible partout.</span>
+        </div>
+      </div>
+      <form id="contact-form" onsubmit="return sendMail(event)">
+        <div class="field">
+          <label for="nom" data-en="Name">Nom</label>
+          <input type="text" id="nom" name="nom" required placeholder="Votre nom" data-en-ph="Your name" />
+        </div>
+        <div class="field">
+          <label for="compagnie" data-en="Company">Compagnie</label>
+          <input type="text" id="compagnie" name="compagnie" placeholder="Nom de votre entreprise" data-en-ph="Your company name" />
+        </div>
+        <div class="field">
+          <label for="courriel" data-en="Email">Courriel</label>
+          <input type="email" id="courriel" name="courriel" required placeholder="vous@compagnie.ca" data-en-ph="you@company.ca" />
+        </div>
+        <div class="field">
+          <label for="message" data-en="Message">Message</label>
+          <textarea id="message" name="message" required placeholder="Parlez-nous de votre réalité de chantier..." data-en-ph="Tell us about your job-site reality..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="justify-content:center;">
+          <span data-en="Send message">Envoyer le message</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="site">
+    <div class="wrap footer-inner">
+      <div class="brand" style="font-size:1.1rem;">Olli<span class="dot">v</span>ander</div>
+      <div>© <span id="year"></span> <span data-en="Ollivander. Custom app development in Qu&eacute;bec.">Ollivander. Développement d'apps sur mesure au Québec.</span></div>
+      <a href="mailto:olivier@ollivander.ca">olivier@ollivander.ca</a>
+    </div>
+  </footer>
+
+  <script>
+    // Année dynamique
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // ---------- Bilingue FR / EN ----------
+    const i18nEls = document.querySelectorAll('[data-en]');
+    i18nEls.forEach((el) => { el.setAttribute('data-fr', el.innerHTML); });
+
+    const phEls = document.querySelectorAll('[data-en-ph]');
+    phEls.forEach((el) => { el.setAttribute('data-fr-ph', el.getAttribute('placeholder') || ''); });
+
+    const titles = {
+      fr: 'Ollivander | Des outils numériques bâtis pour la construction québécoise',
+      en: 'Ollivander | Digital tools built for Québec construction'
+    };
+
+    const langBtn = document.getElementById('langToggle');
+    const langLabel = document.getElementById('langLabel');
+    let lang = localStorage.getItem('lang') || 'fr';
+
+    function applyLang(l) {
+      lang = l;
+      document.documentElement.lang = (l === 'en') ? 'en-CA' : 'fr-CA';
+      i18nEls.forEach((el) => {
+        el.innerHTML = (l === 'en') ? el.getAttribute('data-en') : el.getAttribute('data-fr');
+      });
+      phEls.forEach((el) => {
+        el.placeholder = (l === 'en') ? el.getAttribute('data-en-ph') : el.getAttribute('data-fr-ph');
+      });
+      document.title = titles[l];
+      langLabel.textContent = (l === 'en') ? 'FR' : 'EN';
+      langBtn.setAttribute('aria-label', (l === 'en') ? 'Passer en français' : 'Switch to English');
+      localStorage.setItem('lang', l);
+    }
+
+    langBtn.addEventListener('click', () => applyLang(lang === 'en' ? 'fr' : 'en'));
+    applyLang(lang);
+
+    // Nav : fond au scroll
+    const nav = document.getElementById('nav');
+    const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    // Reveal au scroll
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.reveal').forEach((el, i) => {
+      el.style.transitionDelay = (Math.min(i % 4, 3) * 0.07) + 's';
+      io.observe(el);
+    });
+
+    // Formulaire → mailto (localisé selon la langue active)
+    function sendMail(ev) {
+      ev.preventDefault();
+      const nom = document.getElementById('nom').value.trim();
+      const compagnie = document.getElementById('compagnie').value.trim();
+      const courriel = document.getElementById('courriel').value.trim();
+      const message = document.getElementById('message').value.trim();
+      const L = (lang === 'en')
+        ? { subj: 'New project: ', name: 'Name: ', comp: 'Company: ', none: 'Not specified', mail: 'Email: ', msg: 'Message:' }
+        : { subj: 'Nouveau projet : ', name: 'Nom : ', comp: 'Compagnie : ', none: 'Non précisée', mail: 'Courriel : ', msg: 'Message :' };
+      const sujet = encodeURIComponent(L.subj + (compagnie || nom));
+      const corps = encodeURIComponent(
+        L.name + nom + '\n' +
+        L.comp + (compagnie || L.none) + '\n' +
+        L.mail + courriel + '\n\n' +
+        L.msg + '\n' + message
+      );
+      window.location.href = 'mailto:olivier@ollivander.ca?subject=' + sujet + '&body=' + corps;
+      return false;
+    }
+  </script>
+</body>
+</html>
