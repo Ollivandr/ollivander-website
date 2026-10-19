@@ -30,10 +30,11 @@ ollivander-website/
 1. **Hero** : proposition de valeur + CTA « Discuter de votre projet »
 2. **Problèmes qu'on règle** : 4 irritants de chantier
 3. **Notre approche** : Comprendre · Construire · Accompagner
-4. **Ollivander Nexus** : plateforme SaaS modulaire + connexion Microsoft
-5. **Pourquoi Ollivander** : différenciateurs clés
-6. **À propos** : 16 ans d'expérience terrain
-7. **Contact** : formulaire (mailto) + coordonnées
+4. **La suite Vander** : plateforme SaaS modulaire + connexion Microsoft
+5. **Modules en action** : Facturation, TakeOff, Dynamics (captures + fiches détaillées)
+6. **Pourquoi Ollivander** : différenciateurs clés
+7. **À propos** : 16 ans d'expérience terrain
+8. **Contact** : formulaire (mailto) + coordonnées
 
 ---
 
