@@ -1,6 +1,6 @@
 # Ollivander : Site vitrine
 
-Site web vitrine d'**Ollivander**, entreprise de développement d'applications sur mesure pour les PME de la construction québécoise.
+Site web vitrine d'**Ollivander**, entreprise de développement d'applications sur mesure pour les PME de la construction.
 
 > *« Pas une solution générique. Une app construite pour votre réalité de chantier. »*
 
@@ -112,5 +112,5 @@ Le workflow [`azure-swa.yml`](.github/workflows/azure-swa.yml) se déclenche aut
 
 ## 📬 Contact
 
-Olivier : [olivier@ollivander.ca](mailto:olivier@ollivander.ca)
+Olivier : [obourbonnais@ollivander.ca](mailto:obourbonnais@ollivander.ca)
 Basé au Québec. Disponible partout.
