@@ -295,6 +295,11 @@
       outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(46,107,255,0.15);
     }
     .field textarea { resize: vertical; min-height: 120px; }
+    /* Honeypot : retiré du flux et de l'accessibilité, invisible à l'écran */
+    .hp-field { position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+    .form-status { margin-top: 2px; font-size: 0.95rem; font-weight: 500; }
+    .form-status.ok { color: #46d39a; }
+    .form-status.err { color: #ff7a7a; }
 
     /* ---------- Footer ---------- */
     footer.site {
@@ -717,10 +722,16 @@
           <label for="message" data-en="Message">Message</label>
           <textarea id="message" name="message" required placeholder="Parlez-nous de votre réalité de chantier..." data-en-ph="Tell us about your job-site reality..."></textarea>
         </div>
+        <!-- Champ piège anti-pourriel (invisible ; un humain ne le remplit jamais) -->
+        <div class="hp-field" aria-hidden="true">
+          <label for="site">Laissez ce champ vide</label>
+          <input type="text" id="site" name="site" tabindex="-1" autocomplete="off" />
+        </div>
         <button type="submit" class="btn btn-primary" style="justify-content:center;">
           <span data-en="Send message">Envoyer le message</span>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
         </button>
+        <p id="form-status" class="form-status" role="status" aria-live="polite" hidden></p>
       </form>
     </div>
   </section>
@@ -811,24 +822,44 @@
       io.observe(el);
     });
 
-    // Formulaire → mailto (localisé selon la langue active)
-    function sendMail(ev) {
+    // Formulaire → envoi côté serveur (/api/contact → Microsoft Graph). Messages bilingues.
+    async function sendMail(ev) {
       ev.preventDefault();
-      const nom = document.getElementById('nom').value.trim();
-      const compagnie = document.getElementById('compagnie').value.trim();
-      const courriel = document.getElementById('courriel').value.trim();
-      const message = document.getElementById('message').value.trim();
-      const L = (lang === 'en')
-        ? { subj: 'New project: ', name: 'Name: ', comp: 'Company: ', none: 'Not specified', mail: 'Email: ', msg: 'Message:' }
-        : { subj: 'Nouveau projet : ', name: 'Nom : ', comp: 'Compagnie : ', none: 'Non précisée', mail: 'Courriel : ', msg: 'Message :' };
-      const sujet = encodeURIComponent(L.subj + (compagnie || nom));
-      const corps = encodeURIComponent(
-        L.name + nom + '\n' +
-        L.comp + (compagnie || L.none) + '\n' +
-        L.mail + courriel + '\n\n' +
-        L.msg + '\n' + message
-      );
-      window.location.href = 'mailto:obourbonnais@ollivander.ca?subject=' + sujet + '&body=' + corps;
+      const form = document.getElementById('contact-form');
+      const btn = form.querySelector('button[type="submit"]');
+      const btnSpan = btn.querySelector('span');
+      const status = document.getElementById('form-status');
+      const M = (lang === 'en')
+        ? { sending: 'Sending…', ok: 'Thanks! Your message was sent — we\'ll get back to you soon.', invalid: 'Please check the fields and try again.', fail: 'Sending failed. Email us directly at obourbonnais@ollivander.ca.', send: 'Send message' }
+        : { sending: 'Envoi…', ok: 'Merci! Votre message a été envoyé — on vous répond vite.', invalid: 'Vérifiez les champs et réessayez.', fail: 'L\'envoi a échoué. Écrivez-nous directement à obourbonnais@ollivander.ca.', send: 'Envoyer le message' };
+      const payload = {
+        nom: document.getElementById('nom').value.trim(),
+        compagnie: document.getElementById('compagnie').value.trim(),
+        courriel: document.getElementById('courriel').value.trim(),
+        message: document.getElementById('message').value.trim(),
+        site: document.getElementById('site').value, // honeypot (doit rester vide)
+      };
+      status.hidden = true;
+      btn.disabled = true; btnSpan.textContent = M.sending;
+      try {
+        const r = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (r.ok) {
+          form.reset();
+          status.textContent = M.ok; status.className = 'form-status ok'; status.hidden = false;
+        } else if (r.status === 422) {
+          status.textContent = M.invalid; status.className = 'form-status err'; status.hidden = false;
+        } else {
+          throw new Error('http ' + r.status);
+        }
+      } catch (e) {
+        status.textContent = M.fail; status.className = 'form-status err'; status.hidden = false;
+      } finally {
+        btn.disabled = false; btnSpan.textContent = M.send;
+      }
       return false;
     }
   </script>

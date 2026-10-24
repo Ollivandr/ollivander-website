@@ -28,8 +28,8 @@ jobs:
           action: "upload"
           # Emplacement du site (racine du repo : le index.html est à la racine)
           app_location: "/"
-          # Pas d'API back-end pour ce site vitrine
-          api_location: ""
+          # Back-end : Azure Functions du formulaire de contact
+          api_location: "api"
           # Site statique : aucune étape de build, on sert la racine telle quelle
           output_location: ""
 

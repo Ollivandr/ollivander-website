@@ -28,3 +28,7 @@ desktop.ini
 .azure/
 dist/
 build/
+
+# Azure Functions / SWA CLI (local, jamais committé)
+local.settings.json
+.swa/

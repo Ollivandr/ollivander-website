@@ -16,6 +16,9 @@ Site web vitrine d'**Ollivander**, entreprise de développement d'applications s
 ollivander-website/
 ├── index.html                        # Site complet (toutes les sections)
 ├── staticwebapp.config.json          # Config Azure SWA (fallback, en-têtes, sécurité)
+├── assets/                           # Logos Vander + captures des modules
+├── api/                              # Azure Functions (back-end)
+│   └── src/functions/contact.js      #   POST /api/contact → Microsoft Graph sendMail
 ├── .gitignore
 ├── README.md
 └── .github/
@@ -34,7 +37,28 @@ ollivander-website/
 5. **Modules en action** : Facturation, TakeOff, Dynamics (captures + fiches détaillées)
 6. **Pourquoi Ollivander** : différenciateurs clés
 7. **À propos** : 16 ans d'expérience terrain
-8. **Contact** : formulaire (mailto) + coordonnées
+8. **Contact** : formulaire (envoi serveur via `/api/contact`) + coordonnées
+
+---
+
+## 📨 Formulaire de contact (API)
+
+Le formulaire envoie un **vrai courriel côté serveur** via une **Azure Function** gérée par le SWA (`api/`, Node.js v4) — plus de lien `mailto:`.
+
+- **Endpoint :** `POST /api/contact` (anonyme) — [`api/src/functions/contact.js`](api/src/functions/contact.js)
+- **Envoi :** Microsoft Graph `sendMail` depuis `CONTACT_FROM`, **Reply-To = courriel du visiteur**, sujet « Nouveau message – ollivander.ca – {compagnie} ».
+- **Anti-pourriel :** champ **honeypot** invisible (`site`) — s'il est rempli, la requête est acceptée mais **ignorée** (rien n'est envoyé). Validation serveur : longueurs max + format du courriel.
+- **Autorisation :** app Entra `ollivander-contact-mailer` **sans aucune permission Graph** ; l'envoi est autorisé par **Exchange « RBAC for Applications »** (rôle *Application Mail.Send* **limité à la seule boîte** `obourbonnais@ollivander.ca`).
+
+### Application settings du SWA (déjà configurés — jamais dans le dépôt)
+| Clé | Rôle |
+|---|---|
+| `GRAPH_TENANT_ID` | tenant Entra |
+| `GRAPH_CLIENT_ID` | AppId de `ollivander-contact-mailer` |
+| `GRAPH_CLIENT_SECRET` | secret client |
+| `CONTACT_TO` / `CONTACT_FROM` | `obourbonnais@ollivander.ca` |
+
+> ⚠️ **Le secret client expire le `2028-10-24`.** À renouveler avant cette date : générer un nouveau secret sur l'app registration, puis mettre à jour `GRAPH_CLIENT_SECRET` dans les *Application settings* du SWA.
 
 ---
 
