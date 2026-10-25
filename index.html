@@ -125,6 +125,12 @@
     .nav-toggle { display: none; background: none; border: none; color: var(--text); cursor: pointer; }
     @media (max-width: 820px) {
       .nav-links { display: none; }
+      .nav-links.open {
+        display: flex; position: absolute; top: 68px; right: 24px;
+        flex-direction: column; align-items: flex-start; background: var(--bg-2);
+        border: 1px solid var(--border); padding: 16px 18px; border-radius: 12px; gap: 14px;
+        box-shadow: 0 18px 44px rgba(0,0,0,0.5);
+      }
       .nav-toggle { display: block; }
     }
 
@@ -326,17 +332,19 @@
     }
 
     /* ---------- Modules en action ---------- */
-    .mod-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 52px; }
-    @media (max-width: 900px) { .mod-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 620px) { .mod-grid { grid-template-columns: 1fr; } }
+    /* 5 cartes : 3 sur la 1re rangée, 2 centrées sur la 2e (flex + justify-content center) */
+    .mod-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 24px; margin-top: 52px; }
     .mod-card {
+      flex: 0 1 calc(33.333% - 16px); max-width: calc(33.333% - 16px); min-width: 0;
       background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
       overflow: hidden; cursor: pointer; display: flex; flex-direction: column;
       transition: transform 0.3s var(--ease), border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
     }
+    @media (max-width: 900px) { .mod-card { flex-basis: calc(50% - 12px); max-width: calc(50% - 12px); } }
+    @media (max-width: 620px) { .mod-card { flex-basis: 100%; max-width: 100%; } }
     .mod-card:hover { transform: translateY(-5px); border-color: rgba(46,107,255,0.5); box-shadow: 0 18px 48px rgba(0,0,0,0.5); }
-    .mod-shot { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: linear-gradient(135deg, #0e1526, #0a0f1c); }
-    .mod-shot img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+    .mod-shot { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: #0c1120; }
+    .mod-shot img { width: 100%; height: 100%; object-fit: contain; object-position: center; display: block; cursor: zoom-in; }
     .mod-shot.no-img img { display: none; }
     .mod-shot-ph {
       position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -345,7 +353,28 @@
     .mod-shot:not(.no-img) .mod-shot-ph { display: none; }
     .mod-shot-ph svg { opacity: 0.45; }
     .mod-shot-ph span { font-size: 0.74rem; letter-spacing: 0.1em; text-transform: uppercase; }
-    .mod-shot::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, transparent 55%, rgba(8,8,10,0.6)); }
+    .mod-shot::after { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 -1px 0 rgba(255,255,255,0.04); }
+    /* Badge d'état sur une carte (ex. « En déploiement ») */
+    .mod-badge {
+      position: absolute; top: 12px; left: 12px; z-index: 2;
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.66rem; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase; padding: 5px 10px; border-radius: 999px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff;
+      box-shadow: 0 4px 14px rgba(46,107,255,0.4);
+    }
+    /* Cadre de téléphone (carte dont la capture est en portrait) */
+    .mod-shot.phone { display: flex; align-items: center; justify-content: center; }
+    .mod-shot.phone .phone-frame {
+      height: 90%; aspect-ratio: 9 / 19.5; max-width: 86%;
+      background: #04060c; border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 5px;
+      box-shadow: 0 12px 34px rgba(0,0,0,0.55); position: relative; overflow: hidden;
+    }
+    .mod-shot.phone .phone-frame::before {
+      content: ""; position: absolute; top: 7px; left: 50%; transform: translateX(-50%);
+      width: 32%; height: 5px; border-radius: 3px; background: #11151f; z-index: 2;
+    }
+    .mod-shot.phone .phone-frame img { width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 15px; cursor: zoom-in; display: block; }
+    .mod-shot.no-img.phone .phone-frame { display: none; }
     .mod-card figcaption { padding: 22px 22px 24px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
     .mod-ico {
       width: 44px; height: 44px; border-radius: 11px; display: flex; align-items: center; justify-content: center;
@@ -388,6 +417,21 @@
       font-size: 1.5rem; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;
     }
     .lb-close:hover { border-color: var(--accent); color: #fff; }
+
+    /* ---------- Lightbox image plein écran ---------- */
+    .img-lightbox {
+      position: fixed; inset: 0; z-index: 210; display: none; align-items: center; justify-content: center;
+      padding: 24px; background: rgba(4,5,10,0.92); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      cursor: zoom-out;
+    }
+    .img-lightbox.open { display: flex; }
+    .img-lightbox img { max-width: 100%; max-height: 92vh; object-fit: contain; border-radius: 10px; box-shadow: 0 30px 90px rgba(0,0,0,0.6); }
+    .ilb-close {
+      position: fixed; top: 18px; right: 20px; z-index: 2; width: 44px; height: 44px; border-radius: 10px;
+      background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: #fff;
+      font-size: 1.7rem; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .ilb-close:hover { border-color: var(--accent); }
   </style>
 </head>
 <body>
@@ -400,7 +444,7 @@
     <div class="wrap nav-inner">
       <a href="#hero" class="brand">Olli<span class="dot">v</span>ander</a>
       <div class="nav-right">
-        <nav class="nav-links">
+        <nav class="nav-links" id="navLinks">
           <a href="#problemes" data-en="Problems">Problèmes</a>
           <a href="#approche" data-en="Approach">Approche</a>
           <a href="#vander" data-en="Vander">Vander</a>
@@ -413,7 +457,7 @@
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
           <span id="langLabel">EN</span>
         </button>
-        <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-links').style.cssText='display:flex;position:absolute;top:68px;right:24px;flex-direction:column;background:var(--bg-2);border:1px solid var(--border);padding:16px;border-radius:12px;gap:14px;'">
+        <button class="nav-toggle" id="navToggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navLinks">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
       </div>
@@ -626,6 +670,49 @@
           </figcaption>
         </figure>
 
+        <!-- Billets temps et matériel -->
+        <figure class="mod-card reveal"
+          data-title="Billets temps et matériel" data-title-en="Time &amp; material tickets"
+          data-desc-long="Vos contremaîtres remplissent les feuilles de temps et matériel sur tablette au chantier, les font signer par le client sur place, et le bureau les reçoit aussitôt — avec signatures et horodatage. Fini les carnets perdus ou mouillés."
+          data-desc-long-en="Your foremen fill out time-and-material sheets on a tablet on site, get the client's signature on the spot, and the office receives them instantly — with signatures and timestamps. No more lost or soaked notebooks."
+          data-feats="Saisie temps et matériel sur tablette|Signature du client au chantier|Transmission immédiate au bureau|Fini les carnets perdus ou mouillés"
+          data-feats-en="Time and material entry on tablet|Client signature on site|Instant delivery to the office|No more lost or soaked notebooks"
+          data-img="assets/modules/feuilles-roses.webp">
+          <div class="mod-shot no-img phone">
+            <span class="mod-badge" data-en="Rolling out">En déploiement</span>
+            <div class="phone-frame">
+              <img alt="Aperçu du module Billets temps et matériel" data-en-alt="Time &amp; material tickets module preview" loading="lazy" onload="this.closest('.mod-shot').classList.remove('no-img')" />
+            </div>
+            <div class="mod-shot-ph"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><path d="M8 11h8M8 15h5"/></svg><span data-en="Preview coming soon">Aperçu à venir</span></div>
+          </div>
+          <figcaption>
+            <div class="mod-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><path d="M8 11h8M8 15h5"/></svg></div>
+            <h3 data-en="Time &amp; material tickets">Billets temps et matériel</h3>
+            <p data-en="Fill out and get your time-and-material tickets signed on a tablet, right on site. No more lost or soaked notebooks that come back three weeks later.">Remplissez et faites signer vos billets temps et matériel sur tablette, au chantier. Fini les carnets perdus ou mouillés qui reviennent trois semaines plus tard.</p>
+            <button class="mod-more" type="button" data-en="View details">Voir en détail <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          </figcaption>
+        </figure>
+
+        <!-- Comparateur d'addenda -->
+        <figure class="mod-card reveal"
+          data-title="Comparateur d'addenda" data-title-en="Addendum comparator"
+          data-desc-long="Déposez deux versions d'un document (devis, plan, addenda) et l'outil met en évidence ce qui a été ajouté, retiré ou modifié — analyse assistée par IA, pour ne jamais rater un changement d'addenda."
+          data-desc-long-en="Drop two versions of a document (spec, drawing, addendum) and the tool highlights what was added, removed or changed — AI-assisted analysis, so you never miss an addendum change."
+          data-feats="Comparaison de deux versions|Repère ajouts, retraits et modifications|Devis, plans, addendas (PDF)|Analyse assistée par IA"
+          data-feats-en="Two-version comparison|Spots additions, removals and changes|Specs, drawings, addenda (PDF)|AI-assisted analysis"
+          data-img="assets/modules/addenda.webp">
+          <div class="mod-shot no-img">
+            <img alt="Aperçu du comparateur d'addenda" data-en-alt="Addendum comparator preview" loading="lazy" onload="this.closest('.mod-shot').classList.remove('no-img')" />
+            <div class="mod-shot-ph"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="9" height="18" rx="1.5"/><rect x="12" y="3" width="9" height="18" rx="1.5"/><path d="M5.5 8h4M14.5 8h4M5.5 12h4M14.5 12h4"/></svg><span data-en="Preview coming soon">Aperçu à venir</span></div>
+          </div>
+          <figcaption>
+            <div class="mod-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="9" height="18" rx="1.5"/><rect x="12" y="3" width="9" height="18" rx="1.5"/><path d="M5.5 8h4M14.5 8h4"/></svg></div>
+            <h3 data-en="Addendum comparator">Comparateur d'addenda</h3>
+            <p data-en="Compare two versions of a document and spot exactly what the addendum changes.">Comparez deux versions d'un document et repérez ce que l'addenda change.</p>
+            <button class="mod-more" type="button" data-en="View details">Voir en détail <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          </figcaption>
+        </figure>
+
       </div>
     </div>
   </section>
@@ -758,6 +845,12 @@
     </div>
   </div>
 
+  <!-- ===== LIGHTBOX IMAGE (plein écran) ===== -->
+  <div class="img-lightbox" id="img-lightbox" role="dialog" aria-modal="true" aria-label="Image agrandie / Enlarged image" aria-hidden="true">
+    <button class="ilb-close" id="ilb-close" type="button" aria-label="Fermer / Close">&times;</button>
+    <img id="ilb-img" alt="" />
+  </div>
+
   <!-- ===== FOOTER ===== -->
   <footer class="site">
     <div class="wrap footer-inner">
@@ -778,6 +871,9 @@
     const phEls = document.querySelectorAll('[data-en-ph]');
     phEls.forEach((el) => { el.setAttribute('data-fr-ph', el.getAttribute('placeholder') || ''); });
 
+    const altEls = document.querySelectorAll('[data-en-alt]');
+    altEls.forEach((el) => { el.setAttribute('data-fr-alt', el.getAttribute('alt') || ''); });
+
     const titles = {
       fr: 'Ollivander | Des outils numériques bâtis pour la construction',
       en: 'Ollivander | Digital tools built for construction'
@@ -795,6 +891,9 @@
       });
       phEls.forEach((el) => {
         el.placeholder = (l === 'en') ? el.getAttribute('data-en-ph') : el.getAttribute('data-fr-ph');
+      });
+      altEls.forEach((el) => {
+        el.alt = (l === 'en') ? el.getAttribute('data-en-alt') : el.getAttribute('data-fr-alt');
       });
       document.title = titles[l];
       langLabel.textContent = (l === 'en') ? 'FR' : 'EN';
@@ -984,6 +1083,41 @@
   <!-- ===== Lightbox des modules ===== -->
   <script>
     (function () {
+      // ── Menu mobile (hamburger) : vrai toggle ouvrir / fermer ────────────
+      const navToggle = document.getElementById('navToggle');
+      const navLinks = document.getElementById('navLinks');
+      if (navToggle && navLinks) {
+        const setMenu = (open) => {
+          navLinks.classList.toggle('open', open);
+          navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        };
+        navToggle.addEventListener('click', (e) => { e.stopPropagation(); setMenu(!navLinks.classList.contains('open')); });
+        navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setMenu(false)));
+        document.addEventListener('click', (e) => {
+          if (navLinks.classList.contains('open') && !navLinks.contains(e.target) && !navToggle.contains(e.target)) setMenu(false);
+        });
+        window.addEventListener('resize', () => { if (window.innerWidth > 820) setMenu(false); });
+      }
+
+      // ── Lightbox image plein écran (clic image, fermeture clic / Échap / ×) ──
+      const ilb = document.getElementById('img-lightbox');
+      const ilbImg = document.getElementById('ilb-img');
+      function openImg(src, alt) {
+        if (!ilb) return;
+        ilbImg.src = src; ilbImg.alt = alt || '';
+        ilb.classList.add('open'); ilb.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden';
+        const c = document.getElementById('ilb-close'); if (c) c.focus();
+      }
+      function closeImg() {
+        ilb.classList.remove('open'); ilb.setAttribute('aria-hidden', 'true');
+        if (!document.getElementById('lightbox').classList.contains('open')) document.body.style.overflow = '';
+      }
+      if (ilb) {
+        ilb.addEventListener('click', closeImg); // clic n'importe où (ou sur ×) ferme
+        document.addEventListener('keydown', e => { if (e.key === 'Escape' && ilb.classList.contains('open')) closeImg(); });
+      }
+
+      // ── Lightbox fiche module ────────────────────────────────────────────
       const lb = document.getElementById('lightbox');
       if (!lb) return;
       const img = document.getElementById('lb-img'), ph = document.getElementById('lb-ph');
@@ -1014,8 +1148,16 @@
 
       document.querySelectorAll('.mod-card').forEach(c => {
         const im = c.querySelector('.mod-shot img');
-        if (im && c.dataset.img) { im.loading = 'eager'; im.src = c.dataset.img; }   // charge la vignette depuis data-img
+        if (im && c.dataset.img) im.src = c.dataset.img;   // vignette (loading="lazy" conservé)
         c.addEventListener('click', () => openCard(c));
+        // Clic sur l'image chargée → plein écran (n'ouvre pas la fiche détaillée)
+        const shot = c.querySelector('.mod-shot');
+        if (shot) shot.addEventListener('click', (e) => {
+          const im2 = c.querySelector('.mod-shot img');
+          if (im2 && im2.getAttribute('src') && !shot.classList.contains('no-img')) {
+            e.stopPropagation(); openImg(im2.currentSrc || im2.src, im2.alt);
+          }
+        });
       });
       lb.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeLb));
       document.addEventListener('keydown', e => { if (e.key === 'Escape' && lb.classList.contains('open')) closeLb(); });
